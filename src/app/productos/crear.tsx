@@ -1,0 +1,93 @@
+import { Alert, Button, StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import InputField from "../../components/InputFiles";
+import { useState } from "react";
+import { ProductRepository } from "../../database/repositories/productRepository";
+import { router } from "expo-router";
+
+export default function CrarProducto() {
+  const [nombre, setNombre] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [precio, setPrecio] = useState("");
+  const [stock, setStock] = useState("");
+
+  const validar = () => {
+    if (!nombre.trim()) {
+      Alert.alert("Error", "El nombre es obligatorio.");
+      return false;
+    }
+    if (!precio.trim() || isNaN(Number(precio)) || Number(precio) <= 0) {
+      Alert.alert("Error", "El precio debe ser un número mayor que 0.");
+      return false;
+    }
+    if (!stock.trim() || isNaN(Number(stock)) || Number(stock) < 0) {
+      Alert.alert(
+        "Error",
+        "El stock debe ser un número mayor que o igual a 0."
+      );
+      return false;
+    }
+    if (!codigo.trim()) {
+      Alert.alert("Error", "El codigo es obligatorio.");
+      return false;
+    }
+    return true;
+  };
+
+  const guardar = async () => {
+    if (!validar()) return;
+    try {
+      const isUnique = await ProductRepository.isCodeUnique(codigo);
+      if (!isUnique) {
+        Alert.alert("Error", "El codigo del producto ya existe.");
+        return;
+      }
+
+      await ProductRepository.create(
+        nombre,
+        Number(precio),
+        Number(stock),
+        codigo
+      );
+      Alert.alert("Éxito", "Producto creado exitosamente.");
+    } catch (error) {
+      Alert.alert("Error", "No se pudo crear el producto.");
+    }
+    router.back();
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Nuevo Producto</Text>
+      <InputField
+        placeholder="Nombre"
+        value={nombre}
+        onChangeText={setNombre}
+      />
+      <InputField
+        placeholder="Código"
+        value={codigo}
+        onChangeText={setCodigo}
+      />
+      <InputField
+        placeholder="Precio"
+        value={precio}
+        onChangeText={setPrecio}
+      />
+      <InputField placeholder="Stock" value={stock} onChangeText={setStock} />
+      <Button title="Guardar" onPress={guardar} />
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+});
