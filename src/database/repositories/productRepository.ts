@@ -11,6 +11,15 @@ export const ProductRepository = {
     return database.getFirstAsync(`SELECT * FROM productos WHERE id = ?`, [id]);
   },
 
+  async search(term: string) {
+    const database = await db;
+    const like = `%${term}%`;
+    return database.getAllAsync(
+      `SELECT * FROM productos WHERE nombre LIKE ? OR codigo LIKE ?`,
+      [like, like]
+    );
+  },
+
   async create(nombre: string, precio: number, stock: number, codigo: string) {
     const database = await db;
     return database.runAsync(
