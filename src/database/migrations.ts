@@ -29,7 +29,8 @@ export const runMigrations = async () => {
       descripcion TEXT,
       tipo TEXT,
       cantidad INTEGER,
-      fecha TEXT DEFAULT CURRENT_TIMESTAMP
-    )
+      fecha TEXT DEFAULT CURRENT_TIMESTAMP,
+      anulado INTEGER DEFAULT 0
+    );
   `);
 };

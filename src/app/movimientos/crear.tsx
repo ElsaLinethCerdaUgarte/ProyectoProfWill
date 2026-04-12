@@ -1,6 +1,7 @@
 import {
   Alert,
   Button,
+  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -62,43 +63,52 @@ export default function CrearMovimiento() {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Crear movimiento</Text>
-      <InputField
-        placeholder="Código o nombre del producto"
-        value={producto}
-        onChangeText={async (value) => {
-          setProducto(value);
-          setProductoId(null);
 
-          if (!value.trim()) {
-            setProductosSugerido([]);
-            return;
-          }
+      {/* Contenedor relativo para anclar el dropdown */}
+      <View style={styles.searchWrapper}>
+        <InputField
+          placeholder="Código o nombre del producto"
+          value={producto}
+          onChangeText={async (value) => {
+            setProducto(value);
+            setProductoId(null);
 
-          const matches = await ProductRepository.search(value.trim());
-          setProductosSugerido(matches as any);
-        }}
-      />
+            if (!value.trim()) {
+              setProductosSugerido([]);
+              return;
+            }
 
-      {productosSugerido.length > 0 && (
-        <View style={styles.suggestionsContainer}>
-          {productosSugerido?.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.suggestionItem}
-              onPress={() => {
-                setProducto(`${item.codigo} - ${item.nombre}`);
-                setProductoId(item.id);
-                setProductosSugerido([]);
-              }}
-            >
-              <Text style={styles.suggestionItemTitle}>{item.nombre}</Text>
-              <Text>
-                {item.codigo} (Stock:{item.stock})
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+            const matches = await ProductRepository.search(value.trim());
+            setProductosSugerido(matches as any);
+          }}
+        />
+
+        {/* Dropdown flotante — no empuja el contenido inferior */}
+        {productosSugerido.length > 0 && (
+          <FlatList
+            style={styles.suggestionsContainer}
+            data={productosSugerido}
+            keyExtractor={(item) => item.id.toString()}
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled={true}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.suggestionItem}
+                onPress={() => {
+                  setProducto(`${item.codigo} - ${item.nombre}`);
+                  setProductoId(item.id);
+                  setProductosSugerido([]);
+                }}
+              >
+                <Text style={styles.suggestionItemTitle}>{item.nombre}</Text>
+                <Text>
+                  {item.codigo} (Stock: {item.stock})
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+      </View>
 
       <Text style={styles.label}>Tipo de movimiento</Text>
       <View style={styles.tipoContainer}>
@@ -171,21 +181,39 @@ const styles = StyleSheet.create({
   },
   tipoButtonTextActive: { color: "#fff", fontWeight: "bold" },
   tipoButtonText: { color: "#333" },
+
+  // === NUEVO: wrapper relativo para anclar el dropdown ===
+  searchWrapper: {
+    position: "relative", // ancla para el absolute hijo
+    zIndex: 10, // eleva encima del resto del form
+    marginBottom: 12,
+  },
+
+  // === NUEVO: el dropdown ahora flota sobre el contenido ===
   suggestionsContainer: {
+    position: "absolute", // no ocupa espacio en el flujo
+    top: "100%", // justo debajo del InputField
+    left: 0,
+    right: 0,
+    maxHeight: 220, // scrolleable si hay muchos resultados
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
-    maxHeight: 200,
-    marginBottom: 12,
     backgroundColor: "#fff",
+    elevation: 8, // sombra Android
+    shadowColor: "#000", // sombra iOS
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    zIndex: 999,
   },
   suggestionItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: "#eee",
   },
   suggestionItemTitle: {
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 2,
   },
 });

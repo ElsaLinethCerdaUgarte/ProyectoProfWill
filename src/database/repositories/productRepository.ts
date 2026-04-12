@@ -29,7 +29,8 @@ export const ProductRepository = {
   },
 
   async adjustStock(id: number, cantidad: number) {
-    (await db).runAsync(
+    const database = await db;
+    await database.runAsync(
       `UPDATE productos SET stock = stock + ? 
       WHERE id=?`,
       [cantidad, id]
