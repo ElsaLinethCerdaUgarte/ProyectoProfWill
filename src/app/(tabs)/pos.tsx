@@ -1,18 +1,21 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
+import ProductSearch from "../../components/ProductSearch";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Cart from "../../components/cart";
 
 export default function Pos() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Punto de venta</Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <ProductSearch />
+      <Cart />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 10,
   },
   title: {
     fontSize: 24,
