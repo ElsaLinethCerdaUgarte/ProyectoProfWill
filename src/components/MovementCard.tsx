@@ -4,6 +4,7 @@ interface Movement {
   id: Number;
   nombre: string;
   tipo: "entrada" | "salida";
+  descripcion: string;
   cantidad: number;
   fecha: string;
 }
@@ -17,6 +18,7 @@ export default function MovementCard({ item }: MovementCardProps) {
     <View style={styles.card}>
       <Text style={styles.name}>{item.nombre}</Text>
       <Text>Tipo: {item.tipo}</Text>
+      <Text>Descripcion: {item.descripcion}</Text>
       <Text>Cantidad: {item.cantidad.toString()}</Text>
       <Text>Fecha: {item.fecha}</Text>
     </View>

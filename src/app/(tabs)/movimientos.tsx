@@ -10,6 +10,8 @@ interface Movement {
   codigo: string;
   nombre: string;
   tipo: "entrada" | "salida";
+  descripcion: string;
+
   cantidad: number;
   fecha: string;
 }
