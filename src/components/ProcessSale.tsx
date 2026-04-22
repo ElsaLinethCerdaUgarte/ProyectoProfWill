@@ -1,7 +1,8 @@
-import { Alert, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useCartStore } from "../store/cartStore";
 import { MovementRepository } from "../database/repositories/movementRepository";
 import { ProductRepository } from "../database/repositories/productRepository";
+import PaymentModal from "./PaymentModal";
 
 export default function ProcessSale() {
   const items = useCartStore((state) => state.items);
@@ -26,16 +27,19 @@ export default function ProcessSale() {
     }
   };
   return (
-    <TouchableOpacity
-      disabled={items.length === 0}
-      style={[
-        styles.processSaleButton,
-        items.length === 0 ? styles.processSaleButtonDisabled : {},
-      ]}
-      onPress={handleSale}
-    >
-      <Text style={styles.processSaleButtonText}> Procesar Venta </Text>
-    </TouchableOpacity>
+    <View>
+      <TouchableOpacity
+        disabled={items.length === 0}
+        style={[
+          styles.processSaleButton,
+          items.length === 0 ? styles.processSaleButtonDisabled : {},
+        ]}
+        onPress={handleSale}
+      >
+        <Text style={styles.processSaleButtonText}> Procesar Venta </Text>
+      </TouchableOpacity>
+      <PaymentModal />
+    </View>
   );
 }
 
