@@ -10,11 +10,18 @@ export const runMigrations = async () => {
       codigo TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
+
+  --DROP TABLE ventas;
+  --DROP TABLE detalle_ventas;
+
     CREATE TABLE IF NOT EXISTS ventas(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     total REAL,
-    fecha TEXT DEFAULT CURRENT_TIMESTAMP
-    );
+    fecha TEXT DEFAULT CURRENT_TIMESTAMP,
+    metodo_pago TEXT,
+    monto_pagado REAL,
+    cambio REAL
+);
     CREATE TABLE IF NOT EXISTS detalle_ventas(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     venta_id INTEGER,
