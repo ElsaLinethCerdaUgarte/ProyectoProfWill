@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface PaymentMethod {
+export interface PaymentMethod {
   tipo: "efectivo" | "tarjeta" | "transferencia";
   monto: number;
   cambio?: number;

@@ -14,19 +14,22 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 interface PaymentModalProps {
   visible: boolean;
   onClose: () => void;
-  onConfirm: () => void;
 }
 
 export default function PaymentModal({ visible, onClose }: PaymentModalProps) {
   const total = useCartStore((state) => state.total);
   const setPayment = useCartStore((state) => state.setPayment);
   const [method, setMethod] = useState<
-    "efectivo" | "tarjeta" | "transferencia"
-  >("efectivo");
+    "efectivo" | "tarjeta" | "transferencia" | null
+  >(null);
   const [amount, setAmount] = useState("");
   const [change, setChange] = useState(0);
 
   const handleConfirm = () => {
+    if (!method) {
+      alert("Seleccione un método de pago");
+      return;
+    }
     let paid: number;
     if (amount.trim() === "") {
       setAmount("0");
@@ -35,7 +38,6 @@ export default function PaymentModal({ visible, onClose }: PaymentModalProps) {
       paid = parseFloat(amount);
     }
 
-    console.log(paid, " - ", total);
     if (paid < total) {
       alert("Monto insuficiente");
       return;
@@ -47,6 +49,9 @@ export default function PaymentModal({ visible, onClose }: PaymentModalProps) {
     };
 
     setPayment(payment);
+    setChange(0);
+    setAmount("0");
+    setMethod(null);
   };
   return (
     <Modal visible={visible} animationType="slide">
@@ -70,18 +75,30 @@ export default function PaymentModal({ visible, onClose }: PaymentModalProps) {
         />
         <CustomButton
           title="Transferencia"
-          onPress={() => setMethod("transferencia")}
+          onPress={() => {
+            setMethod("transferencia");
+            setAmount(total.toString());
+          }}
           iconName="money-bill-transfer"
           isSelected={method === "transferencia"}
         />
-        <TextInput
-          placeholder="Monto pagado"
-          value={amount}
-          onChangeText={setAmount}
-          keyboardType="numeric"
-          style={styles.input}
-        />
-        <Text style={styles.change}>Cambio: C${change} </Text>
+        {method === "efectivo" && (
+          <TextInput
+            placeholder="Monto pagado"
+            value={amount}
+            onChangeText={(text) => {
+              setAmount(text);
+              setChange(Number(text) - total);
+            }}
+            keyboardType="numeric"
+            style={styles.input}
+          />
+        )}
+        {method !== "efectivo" ? null : change < 0 ? (
+          <Text style={styles.change}>Pendiente: C${Math.abs(change)}</Text>
+        ) : (
+          <Text style={styles.change}>Cambio: C${change}</Text>
+        )}
         <CustomButton
           title="Procesar Venta"
           onPress={handleConfirm}
