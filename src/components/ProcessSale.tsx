@@ -3,14 +3,22 @@ import { useCartStore } from "../store/cartStore";
 import { MovementRepository } from "../database/repositories/movementRepository";
 import { ProductRepository } from "../database/repositories/productRepository";
 import PaymentModal from "./PaymentModal";
+import { useState } from "react";
+import CustomButton from "./CustomButton";
 
 export default function ProcessSale() {
   const items = useCartStore((state) => state.items);
   const total = useCartStore((state) => state.total);
+  const payment = useCartStore((state) => state.payment);
   const clearCart = useCartStore((state) => state.clearCart);
+  const [showPayment, setShowPayment] = useState(false);
 
   const handleSale = async () => {
     try {
+      if (!payment) {
+        setShowPayment(true);
+        return;
+      }
       for (const item of items) {
         await MovementRepository.create(
           item.product.id,
@@ -28,17 +36,20 @@ export default function ProcessSale() {
   };
   return (
     <View>
-      <TouchableOpacity
-        disabled={items.length === 0}
-        style={[
-          styles.processSaleButton,
-          items.length === 0 ? styles.processSaleButtonDisabled : {},
-        ]}
+      <CustomButton
         onPress={handleSale}
-      >
-        <Text style={styles.processSaleButtonText}> Procesar Venta </Text>
-      </TouchableOpacity>
-      <PaymentModal />
+        disabled={items.length === 0}
+        title="Procesar Venta"
+        iconName="cart-arrow-down"
+      />
+      <PaymentModal
+        visible={showPayment}
+        onClose={() => setShowPayment(false)}
+        onConfirm={() => {
+          setShowPayment(false);
+          handleSale();
+        }}
+      />
     </View>
   );
 }
