@@ -3,7 +3,7 @@ import { create } from "zustand";
 interface PaymentMethod {
   tipo: "efectivo" | "tarjeta" | "transferencia";
   monto: number;
-  change?: number;
+  cambio?: number;
 }
 
 interface Product {
@@ -49,7 +49,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     calcularTotal();
   },
   clearCart: () => {
-    set({ items: [], total: 0 });
+    set({ items: [], total: 0, payment: null });
   },
 
   setPayment: (payment) => set({ payment }),
